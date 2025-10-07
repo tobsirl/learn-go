@@ -9,3 +9,7 @@ vet: fmt
 
 build: vet
 	go build
+
+clean:
+	go clean
+	rm -f ./hello_world
