@@ -5,7 +5,17 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
+
+// askQuestion prompts the user with the question q and checks against expected.
+// Returns true if the user's answer matches expected exactly after trimming spaces.
+func askQuestion(q, expected string) bool {
+	var answer string
+	fmt.Printf("%s = ", q)
+	fmt.Scanln(&answer)
+	return strings.TrimSpace(answer) == strings.TrimSpace(expected)
+}
 
 func main() {
 	// Open the CSV file
@@ -24,13 +34,27 @@ func main() {
 		log.Fatalf("failed to read csv: %v", err)
 	}
 
-	// Print each record
-	for i, rec := range records {
-		// Expecting two columns: question and answer
-		if len(rec) < 2 {
-			log.Printf("skipping malformed record at line %d: %#v", i+1, rec)
-			continue
-		}
-		fmt.Printf("Q%d: %s = %s\n", i+1, rec[0], rec[1])
+	// Ask only the first question and track correctness
+	if len(records) == 0 {
+		log.Println("no questions found in CSV")
+		return
 	}
+	first := records[0]
+	if len(first) < 2 {
+		log.Println("first record malformed, need question and answer")
+		return
+	}
+
+	correctCount := 0
+	incorrectCount := 0
+
+	if askQuestion(first[0], first[1]) {
+		fmt.Println("Correct!")
+		correctCount++
+	} else {
+		fmt.Printf("Incorrect. Correct answer is %s\n", first[1])
+		incorrectCount++
+	}
+
+	fmt.Printf("Score: %d correct, %d incorrect\n", correctCount, incorrectCount)
 }
