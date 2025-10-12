@@ -1,29 +1,34 @@
 package main
 
 import (
-	"os"
+	"bytes"
+	"io"
+	"strings"
 	"testing"
+	"time"
 )
+
+// slowReader returns first answer quickly then blocks long enough to trigger timeout.
+type slowReader struct {
+    reads int
+}
+
+func (s *slowReader) Read(p []byte) (int, error) {
+    if s.reads == 0 {
+        copy(p, []byte("2\n"))
+        s.reads++
+        return 2, nil
+    }
+    time.Sleep(50 * time.Millisecond)
+    return 0, io.EOF
+}
 
 // helper to run askQuestion with simulated user input
 func runAskQuestion(t *testing.T, question, expected, userInput string) bool {
     t.Helper()
-    // Save original stdin
-    origStdin := os.Stdin
-    defer func() { os.Stdin = origStdin }()
-
-    r, w, err := os.Pipe()
-    if err != nil {
-        t.Fatalf("failed to create pipe: %v", err)
-    }
-    // Write user input followed by newline to pipe
-    if _, err := w.Write([]byte(userInput + "\n")); err != nil {
-        t.Fatalf("failed to write to pipe: %v", err)
-    }
-    w.Close()
-
-    os.Stdin = r
-    return askQuestion(question, expected)
+    in := strings.NewReader(userInput + "\n")
+    out := &bytes.Buffer{}
+    return askQuestion(question, expected, in, out)
 }
 
 func TestAskQuestionCorrect(t *testing.T) {
@@ -58,13 +63,55 @@ func TestAskQuestionCaseSensitivity(t *testing.T) {
 // Benchmark to gauge overhead (optional)
 func BenchmarkAskQuestion(b *testing.B) {
     for i := 0; i < b.N; i++ {
-        // simulate answer each iteration
-        orig := os.Stdin
-        r, w, _ := os.Pipe()
-        w.Write([]byte("10\n"))
-        w.Close()
-        os.Stdin = r
-        _ = askQuestion("5+5", "10")
-        os.Stdin = orig
+        in := strings.NewReader("10\n")
+        out := io.Discard
+        _ = askQuestion("5+5", "10", in, out)
+    }
+}
+
+func TestRunQuizAllCorrect(t *testing.T) {
+    records := [][]string{{"1+1", "2"}, {"2+3", "5"}}
+    // Provide answers quickly
+    in := strings.NewReader("2\n5\n")
+    out := &bytes.Buffer{}
+    correct, incorrect, timedOut := runQuiz(records, 2*time.Second, in, out)
+    if timedOut {
+        t.Fatalf("did not expect timeout")
+    }
+    if correct != 2 || incorrect != 0 {
+        t.Fatalf("expected 2 correct 0 incorrect, got %d %d", correct, incorrect)
+    }
+}
+
+func TestRunQuizTimeout(t *testing.T) {
+    records := [][]string{{"1+1", "2"}, {"2+3", "5"}}
+    // Immediate timeout: timer channel already has a value before any answers processed.
+    in := strings.NewReader("2\n5\n")
+    out := &bytes.Buffer{}
+    timerCh := make(chan time.Time, 1)
+    // Fire immediately
+    timerCh <- time.Now()
+    correct, incorrect, timedOut := runQuizWithTimer(records, in, out, timerCh)
+    if !timedOut {
+        t.Fatalf("expected timeout")
+    }
+    if correct != 0 || incorrect != 0 {
+        t.Fatalf("expected 0 correct 0 incorrect for immediate timeout, got %d %d", correct, incorrect)
+    }
+}
+
+func TestRunQuizSkipsMalformed(t *testing.T) {
+    records := [][]string{{"1+1", "2"}, {"bad"}, {"2+2", "4"}}
+    in := strings.NewReader("2\n4\n")
+    out := &bytes.Buffer{}
+    correct, incorrect, timedOut := runQuiz(records, time.Second, in, out)
+    if timedOut {
+        t.Fatalf("did not expect timeout")
+    }
+    if correct != 2 || incorrect != 0 {
+        t.Fatalf("expected 2 correct 0 incorrect, got %d %d", correct, incorrect)
+    }
+    if !strings.Contains(out.String(), "skipping malformed record") {
+        t.Fatalf("expected malformed record message in output; got: %s", out.String())
     }
 }

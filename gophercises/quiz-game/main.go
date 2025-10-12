@@ -4,79 +4,83 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
 	"time"
 )
 
-// askQuestion prompts the user with the question q and checks against expected.
+// askQuestion prompts the user with the question q and checks against expected using provided IO.
 // Returns true if the user's answer matches expected exactly after trimming spaces.
-func askQuestion(q, expected string) bool {
+func askQuestion(q, expected string, in io.Reader, out io.Writer) bool {
+	// We read a single token (line). Use fmt.Fscan to read until whitespace; acceptable for numeric answers.
+	fmt.Fprintf(out, "%s = ", q)
 	var answer string
-	fmt.Printf("%s = ", q)
-	fmt.Scanln(&answer)
+	fmt.Fscan(in, &answer)
 	return strings.TrimSpace(answer) == strings.TrimSpace(expected)
 }
 
-func main() {
-	// Flags
-	limit := flag.Int("limit", 30, "time limit for the quiz in seconds")
-	flag.Parse()
+// runQuiz runs through the provided records with a time limit, reading answers from input and writing prompts/results to output.
+// Returns counts of correct/incorrect and whether the quiz timed out before completion.
+func runQuiz(records [][]string, limit time.Duration, in io.Reader, out io.Writer) (correct, incorrect int, timedOut bool) {
+	timer := time.NewTimer(limit)
+	defer timer.Stop()
+	return runQuizWithTimer(records, in, out, timer.C)
+}
 
-	// Open the CSV file
-	f, err := os.Open("problems.csv")
-	if err != nil {
-		log.Fatalf("failed to open file: %v", err)
-	}
-	defer f.Close()
-
-	// Create a new CSV reader reading from the opened file
-	r := csv.NewReader(f)
-
-	// Read all records
-	records, err := r.ReadAll()
-	if err != nil {
-		log.Fatalf("failed to read csv: %v", err)
-	}
-
+// runQuizWithTimer allows injecting a timer channel for tests.
+func runQuizWithTimer(records [][]string, in io.Reader, out io.Writer, timerCh <-chan time.Time) (correct, incorrect int, timedOut bool) {
 	if len(records) == 0 {
-		log.Println("no questions found in CSV")
-		return
+		fmt.Fprintln(out, "no questions found")
+		return 0, 0, false
 	}
-
-	correctCount := 0
-	incorrectCount := 0
-
-	timer := time.NewTimer(time.Duration(*limit) * time.Second)
-
 	for i, rec := range records {
 		if len(rec) < 2 {
-			log.Printf("skipping malformed record at line %d: %#v", i+1, rec)
+			fmt.Fprintf(out, "skipping malformed record at line %d: %#v\n", i+1, rec)
 			continue
 		}
-
 		answerCh := make(chan bool)
 		go func(q, ans string) {
-			answerCh <- askQuestion(q, ans)
+			answerCh <- askQuestion(q, ans, in, out)
 		}(rec[0], rec[1])
 
 		select {
-		case correct := <-answerCh:
-			if correct {
-				fmt.Println("Correct!")
-				correctCount++
+		case correctAns := <-answerCh:
+			if correctAns {
+				fmt.Fprintln(out, "Correct!")
+				correct++
 			} else {
-				fmt.Printf("Incorrect. Correct answer is %s\n", rec[1])
-				incorrectCount++
+				fmt.Fprintf(out, "Incorrect. Correct answer is %s\n", rec[1])
+				incorrect++
 			}
-		case <-timer.C:
-			fmt.Println()
-			fmt.Println("Time's up!")
-			fmt.Printf("Final Score: %d correct, %d incorrect (Answered: %d / %d)\n", correctCount, incorrectCount, correctCount+incorrectCount, len(records))
-			return
+		case <-timerCh:
+			fmt.Fprintln(out)
+			fmt.Fprintln(out, "Time's up!")
+			fmt.Fprintf(out, "Final Score: %d correct, %d incorrect (Answered: %d / %d)\n", correct, incorrect, correct+incorrect, len(records))
+			return correct, incorrect, true
 		}
 	}
+	fmt.Fprintf(out, "Final Score: %d correct, %d incorrect (Total: %d)\n", correct, incorrect, correct+incorrect)
+	return correct, incorrect, false
+}
 
-	fmt.Printf("Final Score: %d correct, %d incorrect (Total: %d)\n", correctCount, incorrectCount, correctCount+incorrectCount)
+func main() {
+    // Flags
+    limit := flag.Int("limit", 30, "time limit for the quiz in seconds")
+    flag.Parse()
+
+    f, err := os.Open("problems.csv")
+    if err != nil {
+        log.Fatalf("failed to open file: %v", err)
+    }
+    defer f.Close()
+
+    r := csv.NewReader(f)
+    records, err := r.ReadAll()
+    if err != nil {
+        log.Fatalf("failed to read csv: %v", err)
+    }
+
+    runQuiz(records, time.Duration(*limit)*time.Second, os.Stdin, os.Stdout)
 }
