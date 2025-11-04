@@ -28,11 +28,22 @@ func main() {
 	// println("After change, x:", x)
 
 	// dereferencing
-	x := 10
-	pointerToX := &x
-	fmt.Println(pointerToX)
-	fmt.Println(*pointerToX)
+	// x := 10
+	// pointerToX := &x
+	// fmt.Println(pointerToX)
+	// fmt.Println(*pointerToX)
 
-	z := 20 + *pointerToX
-	fmt.Println(z)
+	// z := 20 + *pointerToX
+	// fmt.Println(z)
+	name := "Alice"
+	changeName(&name)
+	fmt.Println("Memory address of name:", &name)
+
+	m := &name
+	fmt.Println("Value of m (address of name):", m)
+	fmt.Println("Value at address m (value of name):", *m)
+}
+
+func changeName(name *string) {
+	*name = "Bob"
 }
