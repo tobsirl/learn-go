@@ -66,4 +66,5 @@ func main() {
 	}
 	fmt.Println("Pretty JSON:")
 	fmt.Println(string(prettyJSON))
+	
 }
