@@ -66,10 +66,21 @@ func main() {
 	// fmt.Println("Pretty JSON:")
 	// fmt.Println(string(prettyJSON))
 
-	f := func(j int) {
-		fmt.Println("printing", j, "from inside of an anonymous function")
-	}
+	// Example 5: Anonymous function
+	// f := func(j int) {
+	// 	fmt.Println("printing", j, "from inside of an anonymous function")
+	// }
+	// for i := 0; i < 5; i++ {
+	// 	f(i)
+	// }
+
+	// Inline Anonymous function
 	for i := 0; i < 5; i++ {
-		f(i)
+		func(j int) {
+			fmt.Println("printing", j, "from inside of an inline anonymous function")
+		}(i)
 	}
+	func(j int) {
+		fmt.Println("printing", j, "from inside of an inline anonymous function")
+	}(11)
 }
