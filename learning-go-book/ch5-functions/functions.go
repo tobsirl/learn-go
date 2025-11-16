@@ -5,6 +5,10 @@ import (
 	"fmt"
 )
 
+type person struct {
+	name string
+	age  int
+}
 type MyFuncOpts struct {
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -33,6 +37,12 @@ func FromJSON(jsonStr string) (MyFuncOpts, error) {
 	return opts, err
 }
 
+func modifyFails(i int, s string, p person) {
+	i = 42
+	s = "modified"
+	p.name = "Modified Name"
+	p.age = 99
+}
 func main() {
 	// Example 1: Regular struct usage
 	// person1 := MyFuncOpts{
@@ -75,12 +85,24 @@ func main() {
 	// }
 
 	// Inline Anonymous function
-	for i := 0; i < 5; i++ {
-		func(j int) {
-			fmt.Println("printing", j, "from inside of an inline anonymous function")
-		}(i)
-	}
-	func(j int) {
-		fmt.Println("printing", j, "from inside of an inline anonymous function")
-	}(11)
+	// for i := 0; i < 5; i++ {
+	// 	func(j int) {
+	// 		fmt.Println("printing", j, "from inside of an inline anonymous function")
+	// 	}(i)
+	// }
+	// func(j int) {
+	// 	fmt.Println("printing", j, "from inside of an inline anonymous function")
+	// }(11)
+
+	// Go is Call by Value
+	p := person{}
+	i := 2
+	s := "original"
+
+	modifyFails(i, s, p)
+
+	fmt.Println("i after modifyFails:", i)	   // Should print 2
+	fmt.Println("s after modifyFails:", s)       // Should print "original"
+	fmt.Println("person after modifyFails:", p)  // Should print zero values for name and age
+
 }
