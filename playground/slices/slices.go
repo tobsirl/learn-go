@@ -6,9 +6,7 @@ type User struct {
 }
 
 func main() {
-	var users []User
-	users = append(users, User{Name: "Alice", Age: 30})
-	users = append(users, User{Name: "Bob", Age: 25})
+	users := []User{{Name: "John", Age: 20}, {Name: "Jane", Age: 22}}
 
 	for _, user := range users {
 		println("Name:", user.Name, "Age:", user.Age)
