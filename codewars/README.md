@@ -18,15 +18,16 @@ go test ./...
 
 ## Katas
 
-| Folder | Package | Function | What it does |
-|---|---|---|---|
-| [bool_to_word](./bool_to_word) | `booltoword` | `BoolToWord(word bool) string` | Converts a boolean into `"Yes"` or `"No"`. |
-| [count_the_monkeys](./count_the_monkeys) | `countthemonkeys` | `monkeyCount(n int) []int` | Returns the sequence `1..n` (empty for `n <= 0`). |
-| [multiply](./multiply) | `multiply` | `Multiply(a, b int) int` | Multiplies two integers. |
-| [opposite_number](./opposite_number) | `oppositenumber` | `Opposite(number int) int` | Returns the additive inverse of an integer. |
-| [return_negative](./return_negative) | `returnnegative` | `MakeNegative(x int) int` | Ensures a number is negative (or zero). |
-| [reversed_strings](./reversed_strings) | `reversedstrings` | `Solution(word string) string` | Reverses a string (Unicode-safe via runes). |
-| [sum_of_positive](./sum_of_positive) | `sumofpositive` | `PositiveSum(numbers []int) int` | Sums only the positive numbers in a slice. |
+| Folder                                   | Package           | Function                                          | What it does                                      |
+| ---------------------------------------- | ----------------- | ------------------------------------------------- | ------------------------------------------------- |
+| [bool_to_word](./bool_to_word)           | `booltoword`      | `BoolToWord(word bool) string`                    | Converts a boolean into `"Yes"` or `"No"`.        |
+| [count_the_monkeys](./count_the_monkeys) | `countthemonkeys` | `monkeyCount(n int) []int`                        | Returns the sequence `1..n` (empty for `n <= 0`). |
+| [multiply](./multiply)                   | `multiply`        | `Multiply(a, b int) int`                          | Multiplies two integers.                          |
+| [opposite_number](./opposite_number)     | `oppositenumber`  | `Opposite(number int) int`                        | Returns the additive inverse of an integer.       |
+| [return_negative](./return_negative)     | `returnnegative`  | `MakeNegative(x int) int`                         | Ensures a number is negative (or zero).           |
+| [reversed_strings](./reversed_strings)   | `reversedstrings` | `Solution(word string) string`                    | Reverses a string (Unicode-safe via runes).       |
+| [string_repeat](./string_repeat)         | `stringrepeat`    | `RepeatStr(repetitions int, value string) string` | Repeats a string `repetitions` times.             |
+| [sum_of_positive](./sum_of_positive)     | `sumofpositive`   | `PositiveSum(numbers []int) int`                  | Sums only the positive numbers in a slice.        |
 
 ## Notes
 
