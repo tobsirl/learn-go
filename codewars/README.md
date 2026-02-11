@@ -27,6 +27,7 @@ go test ./...
 | [remove_first_last_character](./remove_first_last_character) | `removefirstlastcharacter` | `RemoveChar(word string) string`                  | Removes the first and last character (empty if length <= 2). |
 | [return_negative](./return_negative)                         | `returnnegative`           | `MakeNegative(x int) int`                         | Ensures a number is negative (or zero).                      |
 | [reversed_strings](./reversed_strings)                       | `reversedstrings`          | `Solution(word string) string`                    | Reverses a string (Unicode-safe via runes).                  |
+| [square_sum](./square_sum)                                   | `squaresum`                | `SquareSum(numbers []int) int`                    | Returns the sum of the squares of all numbers in a slice.    |
 | [string_repeat](./string_repeat)                             | `stringrepeat`             | `RepeatStr(repetitions int, value string) string` | Repeats a string `repetitions` times.                        |
 | [sum_of_positive](./sum_of_positive)                         | `sumofpositive`            | `PositiveSum(numbers []int) int`                  | Sums only the positive numbers in a slice.                   |
 
