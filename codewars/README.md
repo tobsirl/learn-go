@@ -30,6 +30,7 @@ go test ./...
 | [square_sum](./square_sum)                                   | `squaresum`                | `SquareSum(numbers []int) int`                    | Returns the sum of the squares of all numbers in a slice.    |
 | [string_repeat](./string_repeat)                             | `stringrepeat`             | `RepeatStr(repetitions int, value string) string` | Repeats a string `repetitions` times.                        |
 | [smallest_integer_finder](./smallest_integer_finder)         | `smallestintegerfinder`    | `SmallestIntegerFinder(numbers []int) int`        | Returns the smallest integer in a slice (0 if empty).        |
+| [string_to_number](./string_to_number)                       | `stringtonumber`           | `StringToNumber(str string) int`                  | Converts a string to an integer (handles negatives).         |
 | [sum_of_positive](./sum_of_positive)                         | `sumofpositive`            | `PositiveSum(numbers []int) int`                  | Sums only the positive numbers in a slice.                   |
 
 ## Notes
