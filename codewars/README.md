@@ -33,9 +33,9 @@ go test ./...
 | [string_to_number](./string_to_number)                       | `stringtonumber`           | `StringToNumber(str string) int`                  | Converts a string to an integer (handles negatives).         |
 | [sum_of_positive](./sum_of_positive)                         | `sumofpositive`            | `PositiveSum(numbers []int) int`                  | Sums only the positive numbers in a slice.                   |
 
-| [hello_world](./hello_world)                                 | `helloworld`               | `Greet() string`                                 | Returns the string "hello, world!".                        |
-| [counting_sheep](./counting_sheep)                           | `countingsheep`            | `CountSheep(numbers []bool) int`                  | Counts the number of `true` values in a slice.               |
-| [remove_string_spaces](./remove_string_spaces)               | `removestringspaces`       | `NoSpace(word string) string`                     | Removes all spaces from a string.                            |
+| [hello_world](./hello_world) | `helloworld` | `Greet() string` | Returns the string "hello, world!". |
+| [counting_sheep](./counting_sheep) | `countingsheep` | `CountSheep(numbers []bool) int` | Counts the number of `true` values in a slice. |
+| [remove_string_spaces](./remove_string_spaces) | `removestringspaces` | `NoSpace(word string) string` | Removes all spaces from a string. |
 
 ## Notes
 
